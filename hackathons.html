@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hackathons &amp; Coding Sprints — EduBridge</title>
+  <meta name="description" content="Discover national student hackathons, coding sprints, AI competitions, and prizes across India.">
+  <style>
+    /* ==========================================================================
+       EduBridge Core Theme & Design Tokens
+       ========================================================================== */
+    :root {
+      --primary: #153e2e;
+      --primary-dark: #0e2a1f;
+      --primary-light: #205c44;
+      --primary-hover: #1b4e3a;
+      --secondary: #587965;
+      --secondary-light: #8fa897;
+      --secondary-soft: #eaf1ed;
+      --accent: #2e6b52;
+      --accent-warm: #c59b27;
+      
+      --bg-body: #f8f6f0;
+      --bg-surface: #ffffff;
+      --bg-surface-glass: rgba(255, 255, 255, 0.88);
+      --bg-subtle: #f0ece1;
+      
+      --text-primary: #1c231f;
+      --text-secondary: #4f5d54;
+      --text-muted: #7d8b82;
+      
+      --border: #e2ddd4;
+      --border-light: #ece8df;
+      --border-focus: #153e2e;
+      
+      --shadow-sm: 0 1px 3px rgba(21, 62, 46, 0.05);
+      --shadow-md: 0 4px 14px rgba(21, 62, 46, 0.07);
+      --shadow-lg: 0 12px 30px rgba(21, 62, 46, 0.10);
+      
+      --sidebar-width: 250px;
+      --sidebar-collapsed-width: 72px;
+      --topbar-height: 74px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-primary);
+      line-height: 1.55;
+      font-size: 15px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .sidebar-header {
+      height: var(--topbar-height);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border-light);
+      flex-shrink: 0;
+    }
+
+    .hamburger-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 1px solid transparent;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .hamburger-btn:hover {
+      background: var(--secondary-soft);
+      color: var(--primary);
+      border-color: var(--border);
+    }
+
+    .hamburger-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+    }
+
+    .sidebar-nav {
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      flex-grow: 1;
+    }
+
+    .nav-section {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 0 12px 6px;
+      white-space: nowrap;
+      transition: opacity 0.2s ease;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 14px;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      stroke-width: 1.85;
+    }
+
+    .nav-item:hover {
+      background: var(--secondary-soft);
+      color: var(--primary);
+    }
+
+    .nav-item.btn-sign-out:hover {
+      background: rgba(197, 48, 48, 0.1);
+      color: #991b1b;
+    }
+
+    .nav-item.active {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .nav-item.active svg {
+      stroke: #ffffff;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--secondary-soft);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+    }
+
+    .nav-item.active .nav-badge {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar.collapsed .sidebar-header {
+      justify-content: center;
+      padding: 0;
+    }
+
+    .sidebar.collapsed .nav-section-title {
+      opacity: 0;
+      pointer-events: none;
+      height: 0;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar.collapsed .nav-item {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed .nav-label,
+    .sidebar.collapsed .nav-badge {
+      display: none;
+    }
+
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 35, 25, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+
+    .sidebar-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Top Navigation Bar */
+    .topbar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: var(--sidebar-width);
+      height: var(--topbar-height);
+      background: var(--bg-surface-glass);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      z-index: 900;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar.collapsed ~ .topbar {
+      left: var(--sidebar-collapsed-width);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .mobile-hamburger-btn {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+    }
+
+    .mobile-hamburger-btn:hover {
+      background: var(--secondary-soft);
+      color: var(--primary);
+    }
+
+    .brand-wordmark {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--primary);
+      display: flex;
+      align-items: baseline;
+    }
+
+    .brand-wordmark .brand-accent {
+      font-family: "Georgia", "Times New Roman", serif;
+      font-style: italic;
+      font-weight: 500;
+      color: var(--secondary);
+      margin-left: 1px;
+    }
+
+    .topbar-search-container {
+      flex: 1;
+      max-width: 380px;
+      margin: 0 20px;
+      position: relative;
+    }
+
+    .topbar-search-input {
+      width: 100%;
+      height: 40px;
+      padding: 0 16px 0 38px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: var(--bg-body);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .topbar-search-input:focus {
+      background: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(21, 62, 46, 0.1);
+    }
+
+    .topbar-search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .date-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-light);
+    }
+
+    .date-pill svg {
+      width: 14px;
+      height: 14px;
+      color: var(--primary);
+    }
+
+    .profile-avatar-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: var(--primary);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      border: 2px solid #ffffff;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    .profile-avatar-btn:hover {
+      transform: scale(1.05);
+      background: var(--primary-light);
+    }
+
+    /* Main Content Wrapper */
+    .main-wrapper {
+      margin-left: var(--sidebar-width);
+      margin-top: var(--topbar-height);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      min-height: calc(100vh - var(--topbar-height));
+    }
+
+    .sidebar.collapsed ~ .main-wrapper {
+      margin-left: var(--sidebar-collapsed-width);
+    }
+
+    .main-content {
+      padding: 32px 36px 60px;
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+      flex: 1;
+    }
+
+    /* Page Header */
+    .page-header-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .page-desc {
+      color: var(--text-secondary);
+      font-size: 14.5px;
+      margin-top: 4px;
+      max-width: 650px;
+    }
+
+    /* Filter & Search Bar */
+    .filters-bar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-pill-btn {
+      padding: 7px 16px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    .filter-pill-btn:hover {
+      background: var(--secondary-soft);
+      color: var(--primary);
+    }
+
+    .filter-pill-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .filter-search-box {
+      position: relative;
+      min-width: 280px;
+    }
+
+    .filter-search-box input {
+      width: 100%;
+      height: 38px;
+      padding: 0 14px 0 36px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg-body);
+      font-size: 13px;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .filter-search-box input:focus {
+      border-color: var(--primary);
+      background: #ffffff;
+    }
+
+    .filter-search-box svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px;
+      height: 15px;
+      color: var(--text-muted);
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--secondary-light);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .format-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .format-online {
+      background: #e6f4ea;
+      color: #137333;
+    }
+
+    .format-offline {
+      background: #fef7e0;
+      color: #b06000;
+    }
+
+    .format-hybrid {
+      background: #e8f0fe;
+      color: #1a73e8;
+    }
+
+    .bookmark-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      border: 1px solid var(--border-light);
+      background: var(--bg-body);
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .bookmark-btn:hover {
+      color: var(--primary);
+      background: var(--secondary-soft);
+      border-color: var(--border);
+    }
+
+    .bookmark-btn.saved {
+      color: #c59b27;
+      background: #fff8e7;
+      border-color: #f7e3b5;
+    }
+
+    .bookmark-btn.saved svg {
+      fill: #c59b27;
+      stroke: #c59b27;
+    }
+
+    .card-title {
+      font-size: 1.18rem;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--text-primary);
+    }
+
+    .card-host {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    .card-specs {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--bg-subtle);
+      padding: 14px;
+      border-radius: var(--radius-md);
+      font-size: 12.5px;
+    }
+
+    .spec-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .spec-label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .spec-value {
+      font-weight: 600;
+      color: var(--text-primary);
+      text-align: right;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 13px;
+      transition: var(--transition);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      border: 1px solid var(--primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: var(--radius-full);
+    }
+
+    .badge-demo {
+      background: #fff4dc;
+      color: #8c5b00;
+      border: 1px solid #fae1aa;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 35, 25, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 2500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-box {
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      max-width: 580px;
+      width: 100%;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transform: scale(0.95);
+      transition: var(--transition);
+    }
+
+    .modal-backdrop.active .modal-box {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-subtle);
+    }
+
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 14px;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--primary-dark);
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: auto;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast svg {
+      width: 18px;
+      height: 18px;
+      color: #6ee7b7;
+      flex-shrink: 0;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 48px 24px;
+      background: var(--bg-surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-lg);
+      color: var(--text-secondary);
+    }
+
+    /* Footer */
+    .site-footer {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border);
+      padding: 40px 36px 28px;
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 1100px) {
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 991px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.mobile-open {
+        transform: translateX(0);
+        width: 270px;
+      }
+      .topbar {
+        left: 0 !important;
+        padding: 0 16px;
+      }
+      .mobile-hamburger-btn {
+        display: inline-flex;
+      }
+      .main-wrapper {
+        margin-left: 0 !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 24px 16px 48px;
+      }
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+      .topbar-search-container, .date-pill {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Backdrop for Mobile Sidebar -->
+  <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
+
+  <!-- Shared Sidebar Navigation -->
+  <aside id="mainSidebar" class="sidebar" aria-label="Main Navigation">
+    <div class="sidebar-header">
+      <button id="desktopHamburgerBtn" class="hamburger-btn" aria-label="Toggle navigation sidebar" title="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- DISCOVER SECTION -->
+      <div class="nav-section">
+        <div class="nav-section-title">Discover</div>
+        
+        <a href="index.html" class="nav-item" title="Home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span class="nav-label">Home</span>
+        </a>
+
+        <a href="scholarships.html" class="nav-item" title="Scholarships">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
+          <span class="nav-label">Scholarships</span>
+        </a>
+
+        <a href="internships.html" class="nav-item" title="Internships">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+          <span class="nav-label">Internships</span>
+        </a>
+
+        <a href="hackathons.html" class="nav-item active" title="Hackathons">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          <span class="nav-label">Hackathons</span>
+        </a>
+
+        <a href="learn.html" class="nav-item" title="Learn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          <span class="nav-label">Learn</span>
+        </a>
+      </div>
+
+      <!-- PERSONAL SECTION -->
+      <div class="nav-section">
+        <div class="nav-section-title">Personal</div>
+
+        <a href="dashboard.html" class="nav-item" title="Dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9"></rect>
+            <rect x="14" y="3" width="7" height="5"></rect>
+            <rect x="14" y="12" width="7" height="9"></rect>
+            <rect x="3" y="16" width="7" height="5"></rect>
+          </svg>
+          <span class="nav-label">Dashboard</span>
+          <span id="sidebarSavedBadge" class="nav-badge" style="display: none;">0</span>
+        </a>
+
+        <a href="profile.html" class="nav-item" title="Profile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span class="nav-label">Profile</span>
+        </a>
+
+        <button id="sidebarSignOutBtn" class="nav-item btn-sign-out" title="Sign Out" style="width: 100%; border: none; background: none; text-align: left; cursor: pointer;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span class="nav-label">Sign Out</span>
+        </button>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Sticky Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button id="mobileHamburgerBtn" class="mobile-hamburger-btn" aria-label="Open mobile navigation menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <a href="index.html" class="brand-wordmark">
+        Edu<span class="brand-accent">Bridge</span>
+      </a>
+    </div>
+
+    <div class="topbar-search-container">
+      <svg class="topbar-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="topbarGlobalSearch" class="topbar-search-input" placeholder="Search hackathons, themes, prize pools...">
+    </div>
+
+    <div class="topbar-right">
+      <div id="liveDateDisplay" class="date-pill" title="Today's Date">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span id="currentDateText">Loading...</span>
+      </div>
+
+      <a href="profile.html" id="topbarUserAvatar" class="profile-avatar-btn" title="View Profile" aria-label="Student Profile">
+        AS
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    <main class="main-content">
+
+      <!-- Page Header -->
+      <section class="page-header-box">
+        <div>
+          <h1 class="page-title">Hackathons &amp; Coding Sprints</h1>
+          <p class="page-desc">
+            Compete in national collegiate hackathons, AI builder challenges, and open-source sprints. Form teams, build real products, and win cash prizes.
+          </p>
+        </div>
+        <span class="badge badge-demo">Sample Demonstration Data</span>
+      </section>
+
+      <!-- Filter & Search Controls -->
+      <section class="filters-bar">
+        <div class="filter-pills" id="hackathonFilterPills">
+          <button class="filter-pill-btn active" data-filter="all">All Events</button>
+          <button class="filter-pill-btn" data-filter="Online">Online Only</button>
+          <button class="filter-pill-btn" data-filter="In-Person">In-Person</button>
+          <button class="filter-pill-btn" data-filter="AI & ML">AI &amp; ML</button>
+          <button class="filter-pill-btn" data-filter="FinTech">FinTech</button>
+          <button class="filter-pill-btn" data-filter="Social Impact">Social Impact</button>
+          <button class="filter-pill-btn" id="clearHackathonFiltersBtn" style="color: var(--primary); background: transparent; border: 1px dashed var(--border);">Reset Filters</button>
+        </div>
+
+        <div class="filter-search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="hackathonSearchInput" placeholder="Search by event, host, technology...">
+        </div>
+      </section>
+
+      <!-- Cards Grid -->
+      <div class="cards-grid" id="hackathonsContainer">
+        <!-- Injected via JavaScript -->
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div>&copy; 2026 EduBridge &bull; Hackathons Directory (Demo Data)</div>
+        <div>All event dates, locations, and prize details are demonstration mockups for testing.</div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Detail Modal -->
+  <div id="detailModal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalTitle" style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">Hackathon Details</h3>
+        <button id="modalCloseBtn" aria-label="Close dialog" style="font-size: 24px; line-height: 1; color: var(--text-muted); cursor: pointer; padding: 4px;">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Injected dynamically -->
+      </div>
+      <div class="modal-footer">
+        <a id="modalApplyBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="display:inline-flex;">Apply / Visit Site</a>
+        <button id="modalBookmarkBtn" class="btn btn-outline">Bookmark to Dashboard</button>
+        <button id="modalDismissBtn" class="btn btn-outline">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- ==========================================================================
+       Embedded JavaScript Logic
+       ========================================================================== -->
+  <script type="module">
+    import { protectPage, getUserInitials, handleSignOut, getScopedProfile } from "./auth-guard.js";
+    import {
+      HACKATHON_ITEMS,
+      getOpportunityById,
+      getSavedOpportunities,
+      toggleBookmarkOpportunity,
+      renderOpportunityModalContent,
+      matchesSearchAndCategory,
+      getApplicationStatus,
+      setApplicationStatus,
+      evaluateEligibility,
+      isInComparison,
+      initEduBridgeGlobalFeatures
+    } from "./opportunities-data.js";
+
+    protectPage((currentUser) => {
+      'use strict';
+
+      /* --- 1. Storage Keys --- */
+      const STORAGE_KEY_SIDEBAR = 'edubridge_sidebar_collapsed';
+
+      /* --- 2. UI Toast Notification --- */
+      function showToast(message) {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <span>${message}</span>
+        `;
+        container.appendChild(toast);
+        void toast.offsetWidth;
+        toast.classList.add('show');
+
+        setTimeout(function() {
+          toast.classList.remove('show');
+          setTimeout(function() {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+          }, 300);
+        }, 3200);
+      }
+
+      /* --- 3. Sidebar Controls --- */
+      const sidebar = document.getElementById('mainSidebar');
+      const desktopHamburgerBtn = document.getElementById('desktopHamburgerBtn');
+      const mobileHamburgerBtn = document.getElementById('mobileHamburgerBtn');
+      const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+      const isCollapsed = localStorage.getItem(STORAGE_KEY_SIDEBAR) === 'true';
+      if (isCollapsed && window.innerWidth >= 992) {
+        sidebar.classList.add('collapsed');
+      }
+
+      if (desktopHamburgerBtn) {
+        desktopHamburgerBtn.addEventListener('click', function() {
+          sidebar.classList.toggle('collapsed');
+          localStorage.setItem(STORAGE_KEY_SIDEBAR, sidebar.classList.contains('collapsed'));
+        });
+      }
+
+      if (mobileHamburgerBtn) {
+        mobileHamburgerBtn.addEventListener('click', function() {
+          if (sidebar.classList.contains('mobile-open')) {
+            closeMobileSidebar();
+          } else {
+            openMobileSidebar();
+          }
+        });
+      }
+
+      if (sidebarBackdrop) {
+        sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+      }
+
+      function openMobileSidebar() {
+        sidebar.classList.add('mobile-open');
+        sidebarBackdrop.classList.add('active');
+        sidebarBackdrop.setAttribute('aria-hidden', 'false');
+        mobileHamburgerBtn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMobileSidebar() {
+        sidebar.classList.remove('mobile-open');
+        sidebarBackdrop.classList.remove('active');
+        sidebarBackdrop.setAttribute('aria-hidden', 'true');
+        mobileHamburgerBtn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+
+      window.addEventListener('resize', function() {
+        if (window.innerWidth >= 992 && sidebar.classList.contains('mobile-open')) {
+          closeMobileSidebar();
+        }
+      });
+
+      const navLinks = sidebar.querySelectorAll('.nav-item');
+      navLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          if (window.innerWidth < 992) closeMobileSidebar();
+        });
+      });
+
+      /* --- 4. Topbar Info & Badge --- */
+      function initTopbar() {
+        const dateEl = document.getElementById('currentDateText');
+        if (dateEl) {
+          const today = new Date();
+          dateEl.textContent = today.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        const avatarEl = document.getElementById('topbarUserAvatar');
+        if (avatarEl) {
+          avatarEl.textContent = getUserInitials(currentUser);
+          avatarEl.setAttribute('title', currentUser.displayName || currentUser.email);
+        }
+
+        const sidebarSignOutBtn = document.getElementById('sidebarSignOutBtn');
+        if (sidebarSignOutBtn) {
+          sidebarSignOutBtn.addEventListener('click', handleSignOut);
+        }
+      }
+
+      function updateSavedBadge() {
+        const badge = document.getElementById('sidebarSavedBadge');
+        if (!badge) return;
+        const saved = getSavedOpportunities(currentUser);
+        if (saved.length > 0) {
+          badge.textContent = saved.length;
+          badge.style.display = 'inline-block';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+
+      /* --- 5. Render Hackathons --- */
+      let activeFilter = 'all';
+      let searchKeyword = '';
+      let globalFeatures = null;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('q')) {
+        searchKeyword = urlParams.get('q');
+        const input = document.getElementById('hackathonSearchInput');
+        if (input) input.value = searchKeyword;
+      }
+
+      function renderHackathons() {
+        const container = document.getElementById('hackathonsContainer');
+        if (!container) return;
+
+        const savedItems = getSavedOpportunities(currentUser);
+        const savedIds = new Set(savedItems.map(function(item) { return item.id; }));
+
+        const filtered = HACKATHON_ITEMS.filter(function(item) {
+          return matchesSearchAndCategory(item, searchKeyword, activeFilter);
+        });
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" width="44" height="44" style="margin: 0 auto 12px; color: var(--text-muted);">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <h3 style="font-size: 1.15rem; color: var(--text-primary); margin-bottom: 6px;">No hackathons found</h3>
+              <p style="font-size: 13.5px;">No matches for "${searchKeyword || activeFilter}". Try adjusting your filter or keywords.</p>
+              <button id="resetHackathonFiltersBtn" class="btn btn-outline" style="margin-top: 14px;">Reset All Filters</button>
+            </div>
+          `;
+          const resetBtn = document.getElementById('resetHackathonFiltersBtn');
+          if (resetBtn) {
+            resetBtn.addEventListener('click', resetAllFilters);
+          }
+          return;
+        }
+
+        const userProfile = getScopedProfile(currentUser);
+
+        container.innerHTML = filtered.map(function(item) {
+          const isSaved = savedIds.has(item.id);
+          const isComparing = isInComparison(currentUser, item.id);
+          const eligibility = evaluateEligibility(item, userProfile);
+          let elBadgeStyle = 'background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;';
+          if (eligibility.status === 'review') {
+            elBadgeStyle = 'background: #fef3c7; color: #b45309; border: 1px solid #fde68a;';
+          } else if (eligibility.status === 'unspecified') {
+            elBadgeStyle = 'background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb;';
+          }
+
+          return `
+            <article class="card" data-id="${item.id}">
+              <div class="card-top">
+                <span class="category-tag">${item.mode || 'Online'} &bull; ${item.category}</span>
+                <button class="bookmark-btn ${isSaved ? 'saved' : ''}" data-id="${item.id}" aria-label="${isSaved ? 'Remove from saved' : 'Save hackathon'}" title="${isSaved ? 'Saved in Dashboard' : 'Bookmark to Dashboard'}">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <div>
+                <h3 class="card-title">${item.title}</h3>
+                <div class="card-org">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                  ${item.provider || item.organization}
+                </div>
+              </div>
+
+              <!-- Eligibility Match Pill -->
+              <div style="margin: 6px 0 2px;">
+                <span style="font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 9999px; ${elBadgeStyle}" title="${eligibility.reasons.join(' ')}">
+                  ${eligibility.label}
+                </span>
+              </div>
+
+              <div class="card-specs">
+                <div class="spec-row">
+                  <span class="spec-label">Prize Pool:</span>
+                  <span class="spec-value" style="color: var(--primary);">${item.prizePool || item.highlight}</span>
+                </div>
+                <div class="spec-row">
+                  <span class="spec-label">Format:</span>
+                  <span class="spec-value">${item.mode} (${item.location})</span>
+                </div>
+                <div class="spec-row">
+                  <span class="spec-label">Team Size:</span>
+                  <span class="spec-value" style="font-size: 12px; max-width: 65%;">${item.eligibility}</span>
+                </div>
+              </div>
+
+              <div class="card-footer">
+                <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 500;">
+                  ${item.deadline}
+                </span>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <button type="button" class="btn btn-outline btn-sm share-opp-btn" data-id="${item.id}" title="Share opportunity" aria-label="Share opportunity" style="padding: 5px 8px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                      <circle cx="18" cy="5" r="3"></circle>
+                      <circle cx="6" cy="12" r="3"></circle>
+                      <circle cx="18" cy="19" r="3"></circle>
+                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                  </button>
+                  <button type="button" class="btn btn-outline btn-sm compare-opp-btn ${isComparing ? 'active' : ''}" data-id="${item.id}" title="${isComparing ? 'Remove from comparison' : 'Compare opportunity'}" aria-label="Compare opportunity" style="padding: 5px 8px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                      <path d="M18 20V10M12 20V4M6 20v-6"></path>
+                    </svg>
+                    <span>${isComparing ? 'Comparing' : 'Compare'}</span>
+                  </button>
+                  <button class="btn btn-primary open-details-btn" data-id="${item.id}">
+                    Hack Details
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+        container.querySelectorAll('.bookmark-btn').forEach(function(btn) {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.getAttribute('data-id');
+            const result = toggleBookmarkOpportunity(currentUser, id);
+            showToast(result.saved ? `Saved to Dashboard` : `Removed from saved items`);
+            updateSavedBadge();
+            renderHackathons();
+          });
+        });
+
+        container.querySelectorAll('.open-details-btn').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            openDetailModal(id);
+          });
+        });
+
+        if (globalFeatures) {
+          globalFeatures.updateComparisonTrayUI();
+        }
+      }
+
+      function resetAllFilters() {
+        activeFilter = 'all';
+        searchKeyword = '';
+        const searchInput = document.getElementById('hackathonSearchInput');
+        if (searchInput) searchInput.value = '';
+        const topbarSearch = document.getElementById('topbarGlobalSearch');
+        if (topbarSearch) topbarSearch.value = '';
+        filterPills.forEach(function(b) {
+          if (b.getAttribute('data-filter') === 'all') b.classList.add('active');
+          else b.classList.remove('active');
+        });
+        renderHackathons();
+      }
+
+      /* --- 6. Detail Modal Functionality --- */
+      const detailModal = document.getElementById('detailModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalBody = document.getElementById('modalBody');
+      const modalCloseBtn = document.getElementById('modalCloseBtn');
+      const modalDismissBtn = document.getElementById('modalDismissBtn');
+      const modalBookmarkBtn = document.getElementById('modalBookmarkBtn');
+      const modalApplyBtn = document.getElementById('modalApplyBtn');
+      let currentModalItemId = null;
+
+      function openDetailModal(id) {
+        const item = getOpportunityById(id) || HACKATHON_ITEMS.find(function(s) { return s.id === id; });
+        if (!item) return;
+
+        currentModalItemId = id;
+        modalTitle.textContent = item.title;
+
+        const userProfile = getScopedProfile(currentUser);
+        const currentStage = getApplicationStatus(currentUser, id) || 'Interested';
+        modalBody.innerHTML = renderOpportunityModalContent(item, userProfile, currentStage, currentUser);
+
+        // Attach listener to stage dropdown inside modal
+        const modalStatusSelect = modalBody.querySelector('.modal-status-select');
+        if (modalStatusSelect) {
+          modalStatusSelect.addEventListener('change', function() {
+            const nextStatus = this.value;
+            setApplicationStatus(currentUser, id, nextStatus);
+            showToast(`Application stage updated to "${nextStatus}"`);
+            updateModalBookmarkBtn();
+            updateSavedBadge();
+          });
+        }
+
+        if (item.applicationUrl) {
+          modalApplyBtn.href = item.applicationUrl;
+          modalApplyBtn.style.display = 'inline-flex';
+        } else {
+          modalApplyBtn.style.display = 'none';
+        }
+
+        updateModalBookmarkBtn();
+
+        detailModal.classList.add('active');
+        detailModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeDetailModal() {
+        detailModal.classList.remove('active');
+        detailModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        currentModalItemId = null;
+      }
+
+      function updateModalBookmarkBtn() {
+        if (!currentModalItemId) return;
+        const saved = getSavedOpportunities(currentUser);
+        const isSaved = saved.some(s => s.id === currentModalItemId);
+        modalBookmarkBtn.textContent = isSaved ? "Remove from Dashboard" : "Bookmark to Dashboard";
+      }
+
+      if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeDetailModal);
+      if (modalDismissBtn) modalDismissBtn.addEventListener('click', closeDetailModal);
+      if (detailModal) {
+        detailModal.addEventListener('click', function(e) {
+          if (e.target === detailModal) closeDetailModal();
+        });
+      }
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && detailModal && detailModal.classList.contains('active')) {
+          closeDetailModal();
+        }
+      });
+
+      if (modalBookmarkBtn) {
+        modalBookmarkBtn.addEventListener('click', function() {
+          if (currentModalItemId) {
+            const result = toggleBookmarkOpportunity(currentUser, currentModalItemId);
+            showToast(result.saved ? `Saved to Dashboard` : `Removed from saved items`);
+            updateModalBookmarkBtn();
+            updateSavedBadge();
+            renderHackathons();
+          }
+        });
+      }
+
+      /* --- 7. Filter and Search Listeners --- */
+      const filterPills = document.querySelectorAll('#hackathonFilterPills .filter-pill-btn');
+      filterPills.forEach(function(btn) {
+        if (btn.id === 'clearHackathonFiltersBtn') {
+          btn.addEventListener('click', resetAllFilters);
+          return;
+        }
+        btn.addEventListener('click', function() {
+          filterPills.forEach(function(b) { b.classList.remove('active'); });
+          this.classList.add('active');
+          activeFilter = this.getAttribute('data-filter');
+          renderHackathons();
+        });
+      });
+
+      const searchInput = document.getElementById('hackathonSearchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+          searchKeyword = e.target.value;
+          renderHackathons();
+        });
+      }
+
+      const topbarSearch = document.getElementById('topbarGlobalSearch');
+      if (topbarSearch) {
+        topbarSearch.addEventListener('input', function(e) {
+          searchKeyword = e.target.value;
+          if (searchInput) searchInput.value = searchKeyword;
+          renderHackathons();
+        });
+      }
+
+      /* --- 8. Initial Load & Global Features Initialization --- */
+      initTopbar();
+      updateSavedBadge();
+
+      globalFeatures = initEduBridgeGlobalFeatures({
+        currentUser,
+        showToast,
+        onOpenDetailModal: openDetailModal,
+        userProfile: getScopedProfile(currentUser)
+      });
+
+      renderHackathons();
+
+      const autoOpenId = urlParams.get('id');
+      if (autoOpenId) {
+        openDetailModal(autoOpenId);
+      }
+    });
+  </script>
+</body>
+</html>

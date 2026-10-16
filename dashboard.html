@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard — EduBridge</title>
+  <meta name="description" content="View, track, and manage all your saved scholarships, internships, hackathons, and certifications.">
+  <style>
+    /* ==========================================================================
+       EduBridge Core Theme & Design Tokens
+       ========================================================================== */
+    :root {
+      --primary: #153e2e;
+      --primary-dark: #0e2a1f;
+      --primary-light: #205c44;
+      --primary-hover: #1b4e3a;
+      --secondary: #587965;
+      --secondary-light: #8fa897;
+      --secondary-soft: #eaf1ed;
+      --accent: #2e6b52;
+      --accent-warm: #c59b27;
+      
+      --bg-body: #f8f6f0;
+      --bg-surface: #ffffff;
+      --bg-surface-glass: rgba(255, 255, 255, 0.88);
+      --bg-subtle: #f0ece1;
+      
+      --text-primary: #1c231f;
+      --text-secondary: #4f5d54;
+      --text-muted: #7d8b82;
+      
+      --border: #e2ddd4;
+      --border-light: #ece8df;
+      --border-focus: #153e2e;
+      
+      --shadow-sm: 0 1px 3px rgba(21, 62, 46, 0.05);
+      --shadow-md: 0 4px 14px rgba(21, 62, 46, 0.07);
+      --shadow-lg: 0 12px 30px rgba(21, 62, 46, 0.10);
+      
+      --sidebar-width: 250px;
+      --sidebar-collapsed-width: 72px;
+      --topbar-height: 74px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-primary);
+      line-height: 1.55;
+      font-size: 15px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .sidebar-header {
+      height: var(--topbar-height);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border-light);
+      flex-shrink: 0;
+    }
+
+    .hamburger-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 1px solid transparent;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .hamburger-btn:hover {
+      background: var(--secondary-soft);
+      color: var(--primary);
+      border-color: var(--border);
+    }
+
+    .hamburger-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+    }
+
+    .sidebar-nav {
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      flex-grow: 1;
+    }
+
+    .nav-section {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 0 12px 6px;
+      white-space: nowrap;
+      transition: opacity 0.2s ease;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 14px;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      stroke-width: 1.85;
+    }
+
+    .nav-item:hover {
+      background: var(--secondary-soft);
+      color: var(--primary);
+    }
+
+    .nav-item.btn-sign-out:hover {
+      background: rgba(197, 48, 48, 0.1);
+      color: #991b1b;
+    }
+
+    .nav-item.active {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .nav-item.active svg {
+      stroke: #ffffff;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--secondary-soft);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+    }
+
+    .nav-item.active .nav-badge {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar.collapsed .sidebar-header {
+      justify-content: center;
+      padding: 0;
+    }
+
+    .sidebar.collapsed .nav-section-title {
+      opacity: 0;
+      pointer-events: none;
+      height: 0;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar.collapsed .nav-item {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed .nav-label,
+    .sidebar.collapsed .nav-badge {
+      display: none;
+    }
+
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 35, 25, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+
+    .sidebar-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Top Navigation Bar */
+    .topbar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: var(--sidebar-width);
+      height: var(--topbar-height);
+      background: var(--bg-surface-glass);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      z-index: 900;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar.collapsed ~ .topbar {
+      left: var(--sidebar-collapsed-width);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .mobile-hamburger-btn {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+    }
+
+    .mobile-hamburger-btn:hover {
+      background: var(--secondary-soft);
+      color: var(--primary);
+    }
+
+    .brand-wordmark {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--primary);
+      display: flex;
+      align-items: baseline;
+    }
+
+    .brand-wordmark .brand-accent {
+      font-family: "Georgia", "Times New Roman", serif;
+      font-style: italic;
+      font-weight: 500;
+      color: var(--secondary);
+      margin-left: 1px;
+    }
+
+    .topbar-search-container {
+      flex: 1;
+      max-width: 380px;
+      margin: 0 20px;
+      position: relative;
+    }
+
+    .topbar-search-input {
+      width: 100%;
+      height: 40px;
+      padding: 0 16px 0 38px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: var(--bg-body);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .topbar-search-input:focus {
+      background: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(21, 62, 46, 0.1);
+    }
+
+    .topbar-search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .date-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-light);
+    }
+
+    .date-pill svg {
+      width: 14px;
+      height: 14px;
+      color: var(--primary);
+    }
+
+    .profile-avatar-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: var(--primary);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      border: 2px solid #ffffff;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    .profile-avatar-btn:hover {
+      transform: scale(1.05);
+      background: var(--primary-light);
+    }
+
+    /* Main Content Wrapper */
+    .main-wrapper {
+      margin-left: var(--sidebar-width);
+      margin-top: var(--topbar-height);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      min-height: calc(100vh - var(--topbar-height));
+    }
+
+    .sidebar.collapsed ~ .main-wrapper {
+      margin-left: var(--sidebar-collapsed-width);
+    }
+
+    .main-content {
+      padding: 32px 36px 60px;
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+      flex: 1;
+    }
+
+    /* Header & Statistics Grid */
+    .dashboard-header {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .dashboard-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .dashboard-desc {
+      color: var(--text-secondary);
+      font-size: 14.5px;
+      margin-top: 4px;
+    }
+
+    /* Stats Ribbon */
+    .stats-ribbon {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: var(--transition);
+    }
+
+    .stat-card:hover {
+      border-color: var(--secondary-light);
+      transform: translateY(-2px);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.1;
+    }
+
+    /* Controls Bar */
+    .filters-bar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-pill-btn {
+      padding: 7px 16px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    .filter-pill-btn:hover {
+      background: var(--secondary-soft);
+      color: var(--primary);
+    }
+
+    .filter-pill-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .dashboard-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Saved Cards Grid */
+    .saved-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .saved-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .saved-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--secondary-light);
+      transform: translateY(-2px);
+    }
+
+    .saved-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .type-badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--secondary-soft);
+      color: var(--primary);
+    }
+
+    .delete-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #b91c1c;
+      border: 1px solid #fee2e2;
+      background: #fef2f2;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background: #fee2e2;
+      transform: scale(1.08);
+    }
+
+    .delete-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .saved-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--text-primary);
+    }
+
+    .saved-org {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    .saved-specs {
+      background: var(--bg-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      font-size: 12.5px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .spec-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .spec-line span:first-child {
+      color: var(--text-muted);
+    }
+
+    .spec-line span:last-child {
+      font-weight: 600;
+      color: var(--text-primary);
+      text-align: right;
+    }
+
+    .saved-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-light);
+      margin-top: auto;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Empty State */
+    .empty-state-wrapper {
+      grid-column: 1 / -1;
+      background: var(--bg-surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-lg);
+      padding: 60px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .empty-icon-box {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-full);
+      background: var(--secondary-soft);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-icon-box svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .empty-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .empty-desc {
+      color: var(--text-secondary);
+      font-size: 14.5px;
+      max-width: 500px;
+      line-height: 1.6;
+    }
+
+    .empty-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 13px;
+      transition: var(--transition);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      border: 1px solid var(--primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      background: #ffffff;
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+
+    
+    /* Modal / Details Popup */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 35, 25, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 2500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-box {
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      max-width: 620px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transform: scale(0.95);
+      transition: var(--transition);
+    }
+
+    .modal-backdrop.active .modal-box {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-subtle);
+      flex-shrink: 0;
+    }
+
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 14px;
+      overflow-y: auto;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-shrink: 0;
+      background: var(--bg-surface);
+      flex-wrap: wrap;
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--primary-dark);
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: auto;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast svg {
+      width: 18px;
+      height: 18px;
+      color: #6ee7b7;
+      flex-shrink: 0;
+    }
+
+    /* Footer */
+    .site-footer {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border);
+      padding: 40px 36px 28px;
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 1100px) {
+      .stats-ribbon {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .saved-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 991px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.mobile-open {
+        transform: translateX(0);
+        width: 270px;
+      }
+      .topbar {
+        left: 0 !important;
+        padding: 0 16px;
+      }
+      .mobile-hamburger-btn {
+        display: inline-flex;
+      }
+      .main-wrapper {
+        margin-left: 0 !important;
+      }
+      .stats-ribbon {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 24px 16px 48px;
+      }
+      .stats-ribbon {
+        grid-template-columns: 1fr;
+      }
+      .saved-grid {
+        grid-template-columns: 1fr;
+      }
+      .topbar-search-container, .date-pill {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Backdrop for Mobile Sidebar -->
+  <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
+
+  <!-- Shared Sidebar Navigation -->
+  <aside id="mainSidebar" class="sidebar" aria-label="Main Navigation">
+    <div class="sidebar-header">
+      <button id="desktopHamburgerBtn" class="hamburger-btn" aria-label="Toggle navigation sidebar" title="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- DISCOVER SECTION -->
+      <div class="nav-section">
+        <div class="nav-section-title">Discover</div>
+        
+        <a href="index.html" class="nav-item" title="Home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span class="nav-label">Home</span>
+        </a>
+
+        <a href="scholarships.html" class="nav-item" title="Scholarships">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
+          <span class="nav-label">Scholarships</span>
+        </a>
+
+        <a href="internships.html" class="nav-item" title="Internships">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+          <span class="nav-label">Internships</span>
+        </a>
+
+        <a href="hackathons.html" class="nav-item" title="Hackathons">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          <span class="nav-label">Hackathons</span>
+        </a>
+
+        <a href="learn.html" class="nav-item" title="Learn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          <span class="nav-label">Learn</span>
+        </a>
+      </div>
+
+      <!-- PERSONAL SECTION -->
+      <div class="nav-section">
+        <div class="nav-section-title">Personal</div>
+
+        <a href="dashboard.html" class="nav-item active" title="Dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9"></rect>
+            <rect x="14" y="3" width="7" height="5"></rect>
+            <rect x="14" y="12" width="7" height="9"></rect>
+            <rect x="3" y="16" width="7" height="5"></rect>
+          </svg>
+          <span class="nav-label">Dashboard</span>
+          <span id="sidebarSavedBadge" class="nav-badge" style="display: none;">0</span>
+        </a>
+
+        <a href="profile.html" class="nav-item" title="Profile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span class="nav-label">Profile</span>
+        </a>
+
+        <button id="sidebarSignOutBtn" class="nav-item btn-sign-out" title="Sign Out" style="width: 100%; border: none; background: none; text-align: left; cursor: pointer;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span class="nav-label">Sign Out</span>
+        </button>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Sticky Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button id="mobileHamburgerBtn" class="mobile-hamburger-btn" aria-label="Open mobile navigation menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <a href="index.html" class="brand-wordmark">
+        Edu<span class="brand-accent">Bridge</span>
+      </a>
+    </div>
+
+    <div class="topbar-search-container">
+      <svg class="topbar-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="topbarGlobalSearch" class="topbar-search-input" placeholder="Search across EduBridge...">
+    </div>
+
+    <div class="topbar-right">
+      <div id="liveDateDisplay" class="date-pill" title="Today's Date">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span id="currentDateText">Loading...</span>
+      </div>
+
+      <a href="profile.html" id="topbarUserAvatar" class="profile-avatar-btn" title="View Profile" aria-label="Student Profile">
+        AS
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    <main class="main-content">
+
+      <!-- Header Box -->
+      <section class="dashboard-header">
+        <div>
+          <h1 class="dashboard-title">Personal Opportunity Dashboard</h1>
+          <p class="dashboard-desc">
+            Your saved opportunities saved securely inside this browser. Review deadlines, compare criteria, and prepare your applications.
+          </p>
+        </div>
+        <div class="dashboard-actions">
+          <button id="clearAllBtn" class="btn btn-danger btn-sm" style="display: none;">
+            Clear All Saved
+          </button>
+        </div>
+      </section>
+
+      <!-- Stats Summary Ribbon: Tracker & Categories -->
+      <section class="stats-ribbon">
+        <div class="stat-card">
+          <span class="stat-label">Total Saved</span>
+          <span class="stat-value" id="statTotalCount">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Interested</span>
+          <span class="stat-value" id="statInterestedCount" style="color: var(--secondary);">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Preparing</span>
+          <span class="stat-value" id="statPreparingCount" style="color: #b45309;">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Applied</span>
+          <span class="stat-value" id="statAppliedCount" style="color: var(--primary);">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Completed</span>
+          <span class="stat-value" id="statCompletedCount" style="color: #15803d;">0</span>
+        </div>
+      </section>
+
+      <!-- Category & Application Stage Filter Pills -->
+      <section class="filters-bar" style="flex-direction: column; align-items: stretch; gap: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <!-- Category Track Filter -->
+          <div class="filter-pills" id="dashboardFilterPills">
+            <button class="filter-pill-btn active" data-filter="all">All Tracks</button>
+            <button class="filter-pill-btn" data-filter="scholarship">Scholarships</button>
+            <button class="filter-pill-btn" data-filter="internship">Internships</button>
+            <button class="filter-pill-btn" data-filter="hackathon">Hackathons</button>
+            <button class="filter-pill-btn" data-filter="course">Certifications</button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="filter-search-box" style="position: relative; min-width: 240px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--text-muted);">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="dashboardSearchInput" placeholder="Filter saved items..." style="width: 100%; height: 38px; padding: 0 14px 0 36px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg-body); font-size: 13px; outline: none;">
+          </div>
+        </div>
+
+        <!-- Application Tracker Stage Filter (Priority 3) -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding-top: 10px; border-top: 1px solid var(--border-light);">
+          <div class="filter-pills" id="dashboardTrackerPills">
+            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); align-self: center; margin-right: 4px;">Track Stage:</span>
+            <button class="filter-pill-btn active" data-status="all">All Stages</button>
+            <button class="filter-pill-btn" data-status="Interested">Interested</button>
+            <button class="filter-pill-btn" data-status="Preparing">Preparing</button>
+            <button class="filter-pill-btn" data-status="Applied">Applied</button>
+            <button class="filter-pill-btn" data-status="Completed">Completed</button>
+          </div>
+
+          <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;" id="savedResultsCount">
+            Showing 0 items
+          </div>
+        </div>
+      </section>
+
+      <!-- Saved Cards Grid or Empty State -->
+      <div class="saved-grid" id="savedOpportunitiesContainer">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Upcoming Deadlines Demo Section (Priority 4) -->
+      <section class="deadlines-section" style="margin-top: 40px; padding: 24px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="color: var(--primary);">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              Upcoming Application Windows
+            </h3>
+            <p style="font-size: 12.5px; color: var(--text-secondary); margin-top: 2px;">
+              Active opportunities sorted chronologically to help you plan ahead
+            </p>
+          </div>
+          <span style="font-size: 11.5px; background: #fff8e7; color: #b45309; border: 1px solid #fde68a; font-weight: 700; padding: 4px 10px; border-radius: 9999px;">
+            Demo Dataset &bull; Sample Deadlines (2026–27)
+          </span>
+        </div>
+
+        <div id="upcomingDeadlinesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px;">
+          <!-- Injected dynamically -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div>&copy; 2026 EduBridge &bull; Personal Student Opportunity Hub</div>
+        <div>Local storage data is stored privately in your browser session.</div>
+      </div>
+    </footer>
+  </div>
+
+  
+  <!-- Detail Modal -->
+  <div id="detailModal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalTitle" style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">Opportunity Details</h3>
+        <button id="modalCloseBtn" aria-label="Close dialog" style="font-size: 24px; line-height: 1; color: var(--text-muted); cursor: pointer; padding: 4px;">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Injected dynamically -->
+      </div>
+      <div class="modal-footer">
+        <a id="modalTrackBtn" href="#" class="btn btn-outline" style="font-size: 12.5px;">Open Track Page</a>
+        <a id="modalApplyBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="display:inline-flex;">Apply / Visit Site</a>
+        <button id="modalRemoveBtn" class="btn btn-danger">Remove from Saved</button>
+        <button id="modalDismissBtn" class="btn btn-outline">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- ==========================================================================
+       Embedded JavaScript Logic
+       ========================================================================== -->
+  <script type="module">
+    import { protectPage, getUserInitials, handleSignOut, getScopedProfile } from "./auth-guard.js";
+    import {
+      getSavedOpportunities,
+      setSavedOpportunities,
+      getOpportunityById,
+      renderOpportunityModalContent,
+      matchesSearchAndCategory,
+      getApplicationStatus,
+      setApplicationStatus,
+      getApplicationTracker,
+      evaluateEligibility,
+      getUpcomingDeadlines,
+      TRACKER_STATUSES,
+      isInComparison,
+      initEduBridgeGlobalFeatures
+    } from "./opportunities-data.js";
+
+    protectPage((currentUser) => {
+      'use strict';
+
+      /* --- 1. Storage Keys --- */
+      const STORAGE_KEY_SIDEBAR = 'edubridge_sidebar_collapsed';
+
+      /* --- 2. Toast Notifications --- */
+      function showToast(message) {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <span>${message}</span>
+        `;
+        container.appendChild(toast);
+        void toast.offsetWidth;
+        toast.classList.add('show');
+
+        setTimeout(function() {
+          toast.classList.remove('show');
+          setTimeout(function() {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+          }, 300);
+        }, 3200);
+      }
+
+      /* --- 3. Sidebar Controls --- */
+      const sidebar = document.getElementById('mainSidebar');
+      const desktopHamburgerBtn = document.getElementById('desktopHamburgerBtn');
+      const mobileHamburgerBtn = document.getElementById('mobileHamburgerBtn');
+      const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+      const isCollapsed = localStorage.getItem(STORAGE_KEY_SIDEBAR) === 'true';
+      if (isCollapsed && window.innerWidth >= 992) {
+        sidebar.classList.add('collapsed');
+      }
+
+      if (desktopHamburgerBtn) {
+        desktopHamburgerBtn.addEventListener('click', function() {
+          sidebar.classList.toggle('collapsed');
+          localStorage.setItem(STORAGE_KEY_SIDEBAR, sidebar.classList.contains('collapsed'));
+        });
+      }
+
+      if (mobileHamburgerBtn) {
+        mobileHamburgerBtn.addEventListener('click', function() {
+          if (sidebar.classList.contains('mobile-open')) {
+            closeMobileSidebar();
+          } else {
+            openMobileSidebar();
+          }
+        });
+      }
+
+      if (sidebarBackdrop) {
+        sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+      }
+
+      function openMobileSidebar() {
+        sidebar.classList.add('mobile-open');
+        sidebarBackdrop.classList.add('active');
+        sidebarBackdrop.setAttribute('aria-hidden', 'false');
+        mobileHamburgerBtn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMobileSidebar() {
+        sidebar.classList.remove('mobile-open');
+        sidebarBackdrop.classList.remove('active');
+        sidebarBackdrop.setAttribute('aria-hidden', 'true');
+        mobileHamburgerBtn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+
+      window.addEventListener('resize', function() {
+        if (window.innerWidth >= 992 && sidebar.classList.contains('mobile-open')) {
+          closeMobileSidebar();
+        }
+      });
+
+      const navLinks = sidebar.querySelectorAll('.nav-item');
+      navLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          if (window.innerWidth < 992) closeMobileSidebar();
+        });
+      });
+
+      /* --- 4. Topbar Info & Badge --- */
+      function initTopbar() {
+        const dateEl = document.getElementById('currentDateText');
+        if (dateEl) {
+          const today = new Date();
+          dateEl.textContent = today.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        const avatarEl = document.getElementById('topbarUserAvatar');
+        if (avatarEl) {
+          avatarEl.textContent = getUserInitials(currentUser);
+          avatarEl.setAttribute('title', currentUser.displayName || currentUser.email);
+        }
+
+        const sidebarSignOutBtn = document.getElementById('sidebarSignOutBtn');
+        if (sidebarSignOutBtn) {
+          sidebarSignOutBtn.addEventListener('click', handleSignOut);
+        }
+      }
+
+      function updateSavedBadge() {
+        const badge = document.getElementById('sidebarSavedBadge');
+        if (!badge) return;
+        const saved = getSavedOpportunities(currentUser);
+        if (saved.length > 0) {
+          badge.textContent = saved.length;
+          badge.style.display = 'inline-block';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+
+      /* --- 5. Detail Modal Functionality --- */
+      const detailModal = document.getElementById('detailModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalBody = document.getElementById('modalBody');
+      const modalCloseBtn = document.getElementById('modalCloseBtn');
+      const modalDismissBtn = document.getElementById('modalDismissBtn');
+      const modalRemoveBtn = document.getElementById('modalRemoveBtn');
+      const modalApplyBtn = document.getElementById('modalApplyBtn');
+      const modalTrackBtn = document.getElementById('modalTrackBtn');
+      let currentModalItemId = null;
+
+      function openDetailModal(id) {
+        const item = getOpportunityById(id);
+        if (!item) return;
+
+        currentModalItemId = id;
+        modalTitle.textContent = item.title;
+
+        const userProfile = getScopedProfile(currentUser);
+        const currentStage = getApplicationStatus(currentUser, id) || 'Interested';
+        modalBody.innerHTML = renderOpportunityModalContent(item, userProfile, currentStage, currentUser);
+
+        // Attach listener to status dropdown inside modal
+        const modalStatusSelect = modalBody.querySelector('.modal-status-select');
+        if (modalStatusSelect) {
+          modalStatusSelect.addEventListener('change', function() {
+            const nextStatus = this.value;
+            setApplicationStatus(currentUser, id, nextStatus);
+            showToast(`Application stage updated to "${nextStatus}"`);
+            renderDashboard();
+          });
+        }
+
+        if (item.applicationUrl) {
+          modalApplyBtn.href = item.applicationUrl;
+          modalApplyBtn.style.display = 'inline-flex';
+        } else {
+          modalApplyBtn.style.display = 'none';
+        }
+
+        if (item.destinationUrl) {
+          modalTrackBtn.href = `${item.destinationUrl}?id=${item.id}`;
+          modalTrackBtn.style.display = 'inline-flex';
+        } else {
+          modalTrackBtn.style.display = 'none';
+        }
+
+        detailModal.classList.add('active');
+        detailModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeDetailModal() {
+        detailModal.classList.remove('active');
+        detailModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        currentModalItemId = null;
+      }
+
+      if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeDetailModal);
+      if (modalDismissBtn) modalDismissBtn.addEventListener('click', closeDetailModal);
+      if (detailModal) {
+        detailModal.addEventListener('click', function(e) {
+          if (e.target === detailModal) closeDetailModal();
+        });
+      }
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && detailModal && detailModal.classList.contains('active')) {
+          closeDetailModal();
+        }
+      });
+
+      if (modalRemoveBtn) {
+        modalRemoveBtn.addEventListener('click', function() {
+          if (currentModalItemId) {
+            removeSavedItem(currentModalItemId);
+            closeDetailModal();
+          }
+        });
+      }
+
+      /* --- 6. Render Dashboard Opportunities, Stats, & Deadlines --- */
+      let currentFilter = 'all';
+      let currentStatusFilter = 'all';
+      let searchKeyword = '';
+      let globalFeatures = null;
+
+      function renderDashboard() {
+        const items = getSavedOpportunities(currentUser);
+        const userProfile = getScopedProfile(currentUser);
+        const container = document.getElementById('savedOpportunitiesContainer');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const countLabel = document.getElementById('savedResultsCount');
+
+        // Update Tracker Stage Stats (Priority 3)
+        let interestedCount = 0;
+        let preparingCount = 0;
+        let appliedCount = 0;
+        let completedCount = 0;
+
+        items.forEach(function(item) {
+          const stage = getApplicationStatus(currentUser, item.id) || 'Interested';
+          if (stage === 'Interested') interestedCount++;
+          else if (stage === 'Preparing') preparingCount++;
+          else if (stage === 'Applied') appliedCount++;
+          else if (stage === 'Completed') completedCount++;
+        });
+
+        document.getElementById('statTotalCount').textContent = items.length;
+        document.getElementById('statInterestedCount').textContent = interestedCount;
+        document.getElementById('statPreparingCount').textContent = preparingCount;
+        document.getElementById('statAppliedCount').textContent = appliedCount;
+        document.getElementById('statCompletedCount').textContent = completedCount;
+
+        // Toggle Clear All Button
+        if (clearAllBtn) {
+          clearAllBtn.style.display = items.length > 0 ? 'inline-flex' : 'none';
+        }
+
+        // Filter items by category track and application stage
+        const filtered = items.filter(function(i) {
+          const matchesCat = (currentFilter === 'all') || (i.type === currentFilter);
+          const stage = getApplicationStatus(currentUser, i.id) || 'Interested';
+          const matchesStage = (currentStatusFilter === 'all') || (stage === currentStatusFilter);
+
+          const q = searchKeyword.toLowerCase().trim();
+          const title = (i.title || '').toLowerCase();
+          const provider = (i.provider || i.organization || '').toLowerCase();
+          const category = (i.category || '').toLowerCase();
+          const matchesSearch = !q || title.includes(q) || provider.includes(q) || category.includes(q);
+
+          return matchesCat && matchesStage && matchesSearch;
+        });
+
+        if (countLabel) {
+          countLabel.textContent = `Showing ${filtered.length} of ${items.length} saved`;
+        }
+
+        // Empty state: No saved opportunities at all
+        if (items.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state-wrapper">
+              <div class="empty-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+              <h2 class="empty-title">You haven't saved or tracked any opportunities yet</h2>
+              <p class="empty-desc">
+                Browse our curated categories and click bookmark or track stage on any scholarship, internship, hackathon, or course to monitor your application progress right here.
+              </p>
+              <div class="empty-links">
+                <a href="scholarships.html" class="btn btn-primary">Find Scholarships</a>
+                <a href="internships.html" class="btn btn-outline">Find Internships</a>
+                <a href="hackathons.html" class="btn btn-outline">Find Hackathons</a>
+                <a href="learn.html" class="btn btn-outline">Browse Courses</a>
+              </div>
+            </div>
+          `;
+          renderUpcomingDeadlines(items);
+          return;
+        }
+
+        // Empty state: Filters produced no results
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state-wrapper">
+              <h3 class="empty-title">No saved items match your criteria</h3>
+              <p class="empty-desc">No saved opportunities found matching track "${currentFilter}", stage "${currentStatusFilter}", or search "${searchKeyword}".</p>
+              <button class="btn btn-primary" id="resetDashboardFiltersBtn">
+                Reset All Filters
+              </button>
+            </div>
+          `;
+          const resetBtn = document.getElementById('resetDashboardFiltersBtn');
+          if (resetBtn) {
+            resetBtn.addEventListener('click', function() {
+              currentFilter = 'all';
+              currentStatusFilter = 'all';
+              searchKeyword = '';
+              const searchInput = document.getElementById('dashboardSearchInput');
+              if (searchInput) searchInput.value = '';
+              document.querySelectorAll('#dashboardFilterPills .filter-pill-btn').forEach(b => {
+                if (b.getAttribute('data-filter') === 'all') b.classList.add('active');
+                else b.classList.remove('active');
+              });
+              document.querySelectorAll('#dashboardTrackerPills .filter-pill-btn').forEach(b => {
+                if (b.getAttribute('data-status') === 'all') b.classList.add('active');
+                else b.classList.remove('active');
+              });
+              renderDashboard();
+            });
+          }
+          renderUpcomingDeadlines(items);
+          return;
+        }
+
+        container.innerHTML = filtered.map(function(item) {
+          const typeName = item.type.toUpperCase();
+          const savedDate = item.savedAt ? new Date(item.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Saved';
+          const stage = getApplicationStatus(currentUser, item.id) || 'Interested';
+          const eligibility = evaluateEligibility(item, userProfile);
+          const isComparing = isInComparison(currentUser, item.id);
+
+          let highlightVal = item.reward || item.stipend || item.prizePool || item.pricing || item.highlight || 'Curated Opportunity';
+          let highlightRow = `<div class="spec-line"><span>Benefit:</span><span style="color: var(--primary);">${highlightVal}</span></div>`;
+
+          let destinationPage = item.destinationUrl || 'scholarships.html';
+          if (item.type === 'internship') destinationPage = 'internships.html';
+          if (item.type === 'hackathon') destinationPage = 'hackathons.html';
+          if (item.type === 'course') destinationPage = 'learn.html';
+
+          let elBadgeStyle = 'background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;';
+          if (eligibility.status === 'review') {
+            elBadgeStyle = 'background: #fef3c7; color: #b45309; border: 1px solid #fde68a;';
+          } else if (eligibility.status === 'unspecified') {
+            elBadgeStyle = 'background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb;';
+          }
+
+          return `
+            <article class="saved-card" data-id="${item.id}">
+              <div class="saved-card-top">
+                <span class="type-badge">${typeName}</span>
+                <button class="delete-btn" data-id="${item.id}" title="Remove from Dashboard" aria-label="Remove item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
+                </button>
+              </div>
+
+              <div>
+                <h3 class="saved-title">${item.title}</h3>
+                <div class="saved-org">${item.provider || item.organization}</div>
+              </div>
+
+              <!-- Eligibility Assessment Pill (Priority 2) -->
+              <div style="margin-top: 4px;">
+                <span style="font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 9999px; ${elBadgeStyle}" title="${eligibility.reasons.join(' ')}">
+                  ${eligibility.label}
+                </span>
+              </div>
+
+              <div class="saved-specs">
+                ${highlightRow}
+                <div class="spec-line">
+                  <span>Domain:</span>
+                  <span>${item.category || 'General'}</span>
+                </div>
+                <div class="spec-line">
+                  <span>Window:</span>
+                  <span style="font-size: 11.5px;">${item.deadline || 'Demo Window'}</span>
+                </div>
+              </div>
+
+              <!-- Application Tracker Dropdown on Card (Priority 3) -->
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-light); font-size: 12px;">
+                <span style="font-weight: 700; color: var(--text-secondary);">Stage:</span>
+                <select class="card-status-select" data-id="${item.id}" style="padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-surface); font-size: 12px; font-weight: 600; color: var(--primary); cursor: pointer;">
+                  <option value="Interested" ${stage === 'Interested' ? 'selected' : ''}>Interested</option>
+                  <option value="Preparing" ${stage === 'Preparing' ? 'selected' : ''}>Preparing</option>
+                  <option value="Applied" ${stage === 'Applied' ? 'selected' : ''}>Applied</option>
+                  <option value="Completed" ${stage === 'Completed' ? 'selected' : ''}>Completed</option>
+                </select>
+              </div>
+
+              <div class="saved-footer">
+                <span style="font-size: 11px; color: var(--text-muted);">Saved: ${savedDate}</span>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <button type="button" class="btn btn-outline btn-sm share-opp-btn" data-id="${item.id}" title="Share opportunity" aria-label="Share opportunity" style="padding: 5px 8px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                      <circle cx="18" cy="5" r="3"></circle>
+                      <circle cx="6" cy="12" r="3"></circle>
+                      <circle cx="18" cy="19" r="3"></circle>
+                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                  </button>
+                  <button type="button" class="btn btn-outline btn-sm compare-opp-btn ${isComparing ? 'active' : ''}" data-id="${item.id}" title="${isComparing ? 'Remove from comparison' : 'Compare opportunity'}" aria-label="Compare opportunity" style="padding: 5px 8px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                      <path d="M18 20V10M12 20V4M6 20v-6"></path>
+                    </svg>
+                    <span>${isComparing ? 'Comparing' : 'Compare'}</span>
+                  </button>
+                  <button type="button" class="btn btn-outline open-saved-detail-btn" data-id="${item.id}" style="padding: 5px 10px; font-size: 12px;">
+                    View Details
+                  </button>
+                  <a href="${destinationPage}?id=${item.id}" class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;" title="Open full track page">
+                    Open Track &rarr;
+                  </a>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+        // Attach listeners to individual delete buttons
+        container.querySelectorAll('.delete-btn').forEach(function(btn) {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.getAttribute('data-id');
+            removeSavedItem(id);
+          });
+        });
+
+        // Attach listeners to stage status dropdowns
+        container.querySelectorAll('.card-status-select').forEach(function(select) {
+          select.addEventListener('change', function(e) {
+            const id = this.getAttribute('data-id');
+            const nextStatus = this.value;
+            setApplicationStatus(currentUser, id, nextStatus);
+            showToast(`Stage updated to "${nextStatus}"`);
+            renderDashboard();
+          });
+        });
+
+        // Attach listeners to view detail buttons
+        container.querySelectorAll('.open-saved-detail-btn').forEach(function(btn) {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.getAttribute('data-id');
+            openDetailModal(id);
+          });
+        });
+
+        if (globalFeatures) {
+          globalFeatures.updateComparisonTrayUI();
+        }
+
+        renderUpcomingDeadlines(items);
+      }
+
+      /* --- 7. Upcoming Deadlines Rendering (Priority 4) --- */
+      function renderUpcomingDeadlines(savedItems) {
+        const deadlinesBox = document.getElementById('upcomingDeadlinesContainer');
+        if (!deadlinesBox) return;
+
+        // Take upcoming deadlines from master opportunities
+        const upcoming = getUpcomingDeadlines(null, 6);
+        const savedIds = new Set((savedItems || []).map(i => i.id));
+
+        if (upcoming.length === 0) {
+          deadlinesBox.innerHTML = '<p style="font-size: 13px; color: var(--text-muted);">No upcoming deadline dates found.</p>';
+          return;
+        }
+
+        deadlinesBox.innerHTML = upcoming.map(entry => {
+          const opp = entry.opportunity;
+          const isSaved = savedIds.has(opp.id);
+          const formattedDate = entry.date ? entry.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : opp.deadline;
+
+          // Days remaining calculation relative to 2026-10-16 demo timeline
+          const nowMs = new Date("2026-10-16").getTime();
+          let daysLeftText = '';
+          if (entry.date) {
+            const diffDays = Math.ceil((entry.date.getTime() - nowMs) / (1000 * 60 * 60 * 24));
+            if (diffDays > 0) {
+              daysLeftText = `${diffDays} days left`;
+            } else if (diffDays === 0) {
+              daysLeftText = 'Closing Today';
+            } else {
+              daysLeftText = 'Sample Past Window';
+            }
+          }
+
+          return `
+            <div style="background: var(--bg-body); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
+                  <span style="font-size: 11px; font-weight: 700; color: var(--secondary); text-transform: uppercase;">${opp.type}</span>
+                  ${daysLeftText ? `<span style="font-size: 11px; font-weight: 700; color: #b45309; background: #fffbeb; padding: 1px 6px; border-radius: 4px;">${daysLeftText}</span>` : ''}
+                </div>
+                <h4 style="font-size: 13.5px; font-weight: 700; color: var(--text-primary); line-height: 1.4; margin-bottom: 4px;">${opp.title}</h4>
+                <div style="font-size: 12px; color: var(--text-secondary);">${opp.provider || opp.organization}</div>
+              </div>
+
+              <div style="border-top: 1px dashed var(--border); padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 11.5px; font-weight: 600; color: var(--text-muted);">${formattedDate}</span>
+                <button type="button" class="btn btn-outline btn-sm open-deadline-detail-btn" data-id="${opp.id}" style="padding: 3px 8px; font-size: 11.5px;">
+                  View &rarr;
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        deadlinesBox.querySelectorAll('.open-deadline-detail-btn').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.getAttribute('data-id');
+            openDetailModal(id);
+          });
+        });
+      }
+
+      function removeSavedItem(id) {
+        let items = getSavedOpportunities(currentUser);
+        const target = items.find(function(i) { return i.id === id; });
+        const updated = items.filter(function(i) { return i.id !== id; });
+        setSavedOpportunities(currentUser, updated);
+        showToast(`Removed "${target ? target.title : 'Opportunity'}" from your Dashboard`);
+        updateSavedBadge();
+        renderDashboard();
+      }
+
+      // Track filter pills
+      const filterPills = document.querySelectorAll('#dashboardFilterPills .filter-pill-btn');
+      filterPills.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          filterPills.forEach(function(b) { b.classList.remove('active'); });
+          this.classList.add('active');
+          currentFilter = this.getAttribute('data-filter');
+          renderDashboard();
+        });
+      });
+
+      // Tracker status filter pills (Priority 3)
+      const trackerPills = document.querySelectorAll('#dashboardTrackerPills .filter-pill-btn');
+      trackerPills.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          trackerPills.forEach(function(b) { b.classList.remove('active'); });
+          this.classList.add('active');
+          currentStatusFilter = this.getAttribute('data-status');
+          renderDashboard();
+        });
+      });
+
+      // Search input
+      const searchInput = document.getElementById('dashboardSearchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+          searchKeyword = e.target.value;
+          renderDashboard();
+        });
+      }
+
+      const topbarSearch = document.getElementById('topbarGlobalSearch');
+      if (topbarSearch) {
+        topbarSearch.addEventListener('input', function(e) {
+          searchKeyword = e.target.value;
+          if (searchInput) searchInput.value = searchKeyword;
+          renderDashboard();
+        });
+      }
+
+      // Clear all saved
+      const clearAllBtn = document.getElementById('clearAllBtn');
+      if (clearAllBtn) {
+        clearAllBtn.addEventListener('click', function() {
+          if (confirm("Are you sure you want to remove all saved opportunities from your Dashboard?")) {
+            setSavedOpportunities(currentUser, []);
+            showToast("Cleared all bookmarked opportunities");
+            updateSavedBadge();
+            renderDashboard();
+          }
+        });
+      }
+
+      /* --- 8. Initial Load & Global Features Initialization --- */
+      initTopbar();
+      updateSavedBadge();
+
+      globalFeatures = initEduBridgeGlobalFeatures({
+        currentUser,
+        showToast,
+        onOpenDetailModal: openDetailModal,
+        userProfile: getScopedProfile(currentUser)
+      });
+
+      renderDashboard();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const autoOpenId = urlParams.get('id');
+      if (autoOpenId) {
+        openDetailModal(autoOpenId);
+      }
+    });
+  </script>
+</body>
+</html>
