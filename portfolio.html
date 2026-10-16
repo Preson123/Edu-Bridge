@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portfolio Builder — EduBridge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Newsreader:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #153e2e;
+      --primary-light: #1e5640;
+      --primary-dark: #0d281e;
+      --secondary: #587965;
+      --secondary-soft: #e2ece6;
+      --accent: #d97736;
+      --bg-body: #f8f6f0;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f0ece1;
+      --text-primary: #1c231f;
+      --text-secondary: #4f5d54;
+      --text-muted: #7d8b82;
+      --border: #e2ddd4;
+      --border-light: #ede8df;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 12px rgba(21, 62, 46, 0.08);
+      --shadow-lg: 0 12px 28px rgba(21, 62, 46, 0.12);
+      --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      --sidebar-width: 260px;
+      --sidebar-collapsed-width: 76px;
+      --topbar-height: 70px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg-body);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Shared Sidebar Navigation */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-x: hidden;
+    }
+
+    .sidebar-header {
+      height: var(--topbar-height);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .hamburger-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+
+    .hamburger-btn:hover {
+      background: var(--secondary-soft);
+      color: var(--primary);
+    }
+
+    .hamburger-btn svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .nav-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 0 12px 6px;
+      white-space: nowrap;
+      transition: opacity 0.2s ease;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 14px;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      stroke-width: 1.85;
+    }
+
+    .nav-item:hover {
+      background: var(--secondary-soft);
+      color: var(--primary);
+    }
+
+    .nav-item.btn-sign-out:hover {
+      background: rgba(197, 48, 48, 0.1);
+      color: #991b1b;
+    }
+
+    .nav-item.active {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .nav-item.active svg {
+      stroke: #ffffff;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--secondary-soft);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+    }
+
+    .nav-item.active .nav-badge {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar.collapsed .sidebar-header {
+      justify-content: center;
+      padding: 0;
+    }
+
+    .sidebar.collapsed .nav-section-title {
+      opacity: 0;
+      pointer-events: none;
+      height: 0;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar.collapsed .nav-item {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed .nav-label,
+    .sidebar.collapsed .nav-badge {
+      display: none;
+    }
+
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 35, 25, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+
+    .sidebar-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Top Navigation Bar */
+    .topbar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: var(--sidebar-width);
+      height: var(--topbar-height);
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      z-index: 900;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar.collapsed ~ .topbar {
+      left: var(--sidebar-collapsed-width);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .mobile-hamburger-btn {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+    }
+
+    .brand-wordmark {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .brand-accent {
+      font-family: 'Newsreader', Georgia, serif;
+      font-style: italic;
+      color: var(--secondary);
+      font-weight: 400;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .profile-avatar-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: var(--secondary-soft);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      border: 2px solid var(--primary-light);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    /* Main Content */
+    .main-wrapper {
+      margin-left: var(--sidebar-width);
+      padding-top: var(--topbar-height);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar.collapsed ~ .main-wrapper {
+      margin-left: var(--sidebar-collapsed-width);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 28px 32px 56px;
+      max-width: 1480px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Header & Action Bar */
+    .portfolio-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .portfolio-title-group h1 {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .portfolio-title-group p {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .portfolio-status-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+    }
+
+    .status-badge.published {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .status-badge.draft {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 13.5px;
+      padding: 9px 18px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-light);
+    }
+
+    .btn-outline {
+      background: var(--bg-surface);
+      border-color: var(--border);
+      color: var(--text-primary);
+    }
+
+    .btn-outline:hover {
+      background: var(--secondary-soft);
+      border-color: var(--secondary);
+      color: var(--primary);
+    }
+
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: 12.5px;
+    }
+
+    /* Publishing Banner Card */
+    .publish-notice-card {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .publish-notice-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .publish-notice-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #dcfce7;
+      color: #16a34a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .publish-notice-text h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #14532d;
+    }
+
+    .publish-notice-text p {
+      font-size: 12.5px;
+      color: #166534;
+      margin-top: 2px;
+    }
+
+    /* Layout Sections */
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .portfolio-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+
+    .portfolio-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .portfolio-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .portfolio-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .portfolio-card-title svg {
+      width: 18px;
+      height: 18px;
+      color: var(--primary);
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .form-label span {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+      font-size: 13.5px;
+      color: var(--text-primary);
+      font-family: inherit;
+      transition: var(--transition);
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(21, 62, 46, 0.1);
+    }
+
+    /* Avatar Upload Preview */
+    .avatar-upload-row {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .avatar-preview-box {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--secondary-soft);
+      color: var(--primary);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 700;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .avatar-preview-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Project Cards inside Manager */
+    .project-item-card {
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .project-item-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .project-item-remove {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: #fef2f2;
+      border: 1px solid #fee2e2;
+      color: #b91c1c;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .empty-projects-state {
+      text-align: center;
+      padding: 32px 16px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg-body);
+    }
+
+    /* Static Hosting Notice Box */
+    .hosting-explainer-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      font-size: 12.5px;
+      color: #1e40af;
+      line-height: 1.5;
+      margin-top: 24px;
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--primary-dark);
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: auto;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 991px) {
+      .portfolio-grid {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.mobile-open {
+        transform: translateX(0);
+        width: 270px;
+      }
+      .topbar {
+        left: 0 !important;
+        padding: 0 16px;
+      }
+      .mobile-hamburger-btn {
+        display: inline-flex;
+      }
+      .main-wrapper {
+        margin-left: 0 !important;
+      }
+      .main-content {
+        padding: 20px 16px 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Backdrop for Mobile Sidebar -->
+  <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
+
+  <!-- Shared Sidebar Navigation -->
+  <aside id="mainSidebar" class="sidebar" aria-label="Main Navigation">
+    <div class="sidebar-header">
+      <button id="desktopHamburgerBtn" class="hamburger-btn" aria-label="Toggle navigation sidebar" title="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- DISCOVER SECTION -->
+      <div class="nav-section">
+        <div class="nav-section-title">Discover</div>
+        
+        <a href="index.html" class="nav-item" title="Home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span class="nav-label">Home</span>
+        </a>
+
+        <a href="scholarships.html" class="nav-item" title="Scholarships">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
+          <span class="nav-label">Scholarships</span>
+        </a>
+
+        <a href="internships.html" class="nav-item" title="Internships">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+          <span class="nav-label">Internships</span>
+        </a>
+
+        <a href="hackathons.html" class="nav-item" title="Hackathons">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          <span class="nav-label">Hackathons</span>
+        </a>
+
+        <a href="learn.html" class="nav-item" title="Learn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          <span class="nav-label">Learn</span>
+        </a>
+      </div>
+
+      <!-- PERSONAL SECTION -->
+      <div class="nav-section">
+        <div class="nav-section-title">Personal</div>
+
+        <a href="dashboard.html" class="nav-item" title="Dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9"></rect>
+            <rect x="14" y="3" width="7" height="5"></rect>
+            <rect x="14" y="12" width="7" height="9"></rect>
+            <rect x="3" y="16" width="7" height="5"></rect>
+          </svg>
+          <span class="nav-label">Dashboard</span>
+          <span id="sidebarSavedBadge" class="nav-badge" style="display: none;">0</span>
+        </a>
+
+        <a href="resume-builder.html" class="nav-item" title="Resume Builder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span class="nav-label">Resume Builder</span>
+        </a>
+
+        <a href="portfolio.html" class="nav-item active" title="Student Portfolio">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          <span class="nav-label">Portfolio</span>
+        </a>
+
+        <a href="profile.html" class="nav-item" title="Profile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span class="nav-label">Profile</span>
+        </a>
+
+        <button id="sidebarSignOutBtn" class="nav-item btn-sign-out" title="Sign Out" style="width: 100%; border: none; background: none; text-align: left; cursor: pointer;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span class="nav-label">Sign Out</span>
+        </button>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Sticky Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button id="mobileHamburgerBtn" class="mobile-hamburger-btn" aria-label="Open mobile navigation menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <a href="index.html" class="brand-wordmark">
+        Edu<span class="brand-accent">Bridge</span>
+      </a>
+    </div>
+
+    <div class="topbar-right">
+      <a href="profile.html" id="topbarUserAvatar" class="profile-avatar-btn" title="View Profile" aria-label="Student Profile">
+        AS
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    <main class="main-content">
+
+      <!-- Header & Action Bar -->
+      <div class="portfolio-header">
+        <div class="portfolio-title-group">
+          <h1>Student Portfolio Manager</h1>
+          <p>Curate your showcase, publish your public link, and share verified projects with employers.</p>
+        </div>
+
+        <div class="portfolio-status-bar">
+          <div id="publishStatusBadge" class="status-badge draft">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: currentColor;"></span>
+            <span id="publishStatusText">Draft (Private)</span>
+          </div>
+
+          <button type="button" id="saveDraftBtn" class="btn btn-outline btn-sm">
+            Save Draft
+          </button>
+
+          <button type="button" id="publishToggleBtn" class="btn btn-primary btn-sm">
+            Publish Portfolio
+          </button>
+
+          <a href="#" id="viewPublicBtn" target="_blank" class="btn btn-outline btn-sm" style="display: none;">
+            View Public Page &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Published Notification Bar (shown when published) -->
+      <div id="publishSuccessBar" class="publish-notice-card" style="display: none;">
+        <div class="publish-notice-left">
+          <div class="publish-notice-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <div class="publish-notice-text">
+            <h4>Your portfolio is currently published!</h4>
+            <p>Anyone with your public link can view your projects and accomplishments without signing in.</p>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <button type="button" id="copyPublicLinkBtn" class="btn btn-primary btn-sm">
+            Copy Public Link
+          </button>
+          <button type="button" id="unpublishBtn" class="btn btn-outline btn-sm" style="color: #b91c1c; border-color: #fecaca;">
+            Unpublish
+          </button>
+        </div>
+      </div>
+
+      <!-- Portfolio Editor Grid -->
+      <div class="portfolio-grid">
+
+        <!-- Column 1: Profile & About Details -->
+        <div>
+          <!-- 1. Identity & Public Bio -->
+          <div class="portfolio-card">
+            <div class="portfolio-card-header">
+              <div class="portfolio-card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Public Identity & Bio
+              </div>
+            </div>
+
+            <!-- Avatar Upload & Initials -->
+            <div class="avatar-upload-row">
+              <div id="portfolioAvatarBox" class="avatar-preview-box">AS</div>
+              <div>
+                <label for="avatarFileInput" class="form-label" style="margin-bottom: 2px;">Profile Photo <span>(Optional, max 1MB)</span></label>
+                <input type="file" id="avatarFileInput" accept="image/png,image/jpeg,image/webp" style="font-size: 12px; color: var(--text-secondary);">
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">PNG, JPG, or WEBP. Kept client-side.</div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="displayNameInput" class="form-label">Display Name *</label>
+                <input type="text" id="displayNameInput" class="form-input" placeholder="e.g. Alex Sharma" required>
+              </div>
+              <div class="form-group">
+                <label for="publicHeadlineInput" class="form-label">Professional Headline *</label>
+                <input type="text" id="publicHeadlineInput" class="form-input" placeholder="e.g. Full Stack Developer & AI Enthusiast">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="publicBioInput" class="form-label">About Me / Biography</label>
+              <textarea id="publicBioInput" class="form-textarea" rows="4" placeholder="Share a brief overview of your background, learning journey, and what types of opportunities or engineering problems you are most excited to tackle."></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="publicLocationInput" class="form-label">Location / City <span>(optional)</span></label>
+                <input type="text" id="publicLocationInput" class="form-input" placeholder="e.g. Bengaluru, India">
+              </div>
+              <div class="form-group">
+                <label for="publicSkillsInput" class="form-label">Skills & Interests <span>(comma separated)</span></label>
+                <input type="text" id="publicSkillsInput" class="form-input" placeholder="e.g. JavaScript, React, Python, Cloud Systems, UI/UX">
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Professional & Social Links -->
+          <div class="portfolio-card">
+            <div class="portfolio-card-header">
+              <div class="portfolio-card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                Professional & Social Links
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="githubLinkInput" class="form-label">GitHub URL</label>
+                <input type="url" id="githubLinkInput" class="form-input" placeholder="https://github.com/username">
+              </div>
+              <div class="form-group">
+                <label for="linkedinLinkInput" class="form-label">LinkedIn URL</label>
+                <input type="url" id="linkedinLinkInput" class="form-input" placeholder="https://linkedin.com/in/username">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="websiteLinkInput" class="form-label">Personal Website / Blog</label>
+                <input type="url" id="websiteLinkInput" class="form-input" placeholder="https://mywebsite.dev">
+              </div>
+              <div class="form-group">
+                <label for="publicEmailInput" class="form-label">Public Contact Email <span>(optional)</span></label>
+                <input type="email" id="publicEmailInput" class="form-input" placeholder="contact@example.com">
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Education & Certifications -->
+          <div class="portfolio-card">
+            <div class="portfolio-card-header">
+              <div class="portfolio-card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                  <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                </svg>
+                Education & Credentials
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="publicCollegeInput" class="form-label">University / Institute</label>
+                <input type="text" id="publicCollegeInput" class="form-input" placeholder="e.g. National Institute of Technology">
+              </div>
+              <div class="form-group">
+                <label for="publicDegreeInput" class="form-label">Degree & Major</label>
+                <input type="text" id="publicDegreeInput" class="form-input" placeholder="e.g. B.Tech Computer Science">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="publicCertificationsInput" class="form-label">Certifications & Honors <span>(comma separated)</span></label>
+              <input type="text" id="publicCertificationsInput" class="form-input" placeholder="e.g. AWS Certified Practitioner, Hackathon Finalist 2025, Google Cloud Certified">
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Projects Showcase Manager -->
+        <div>
+          <div class="portfolio-card">
+            <div class="portfolio-card-header">
+              <div class="portfolio-card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+                Project Showcase
+              </div>
+              <button type="button" id="addNewProjectBtn" class="btn btn-outline btn-sm">
+                + Add Project
+              </button>
+            </div>
+
+            <div id="portfolioProjectsContainer">
+              <!-- Dynamically rendered project cards -->
+            </div>
+          </div>
+
+          <!-- Static Hosting Limitation & Database Architecture Notice -->
+          <div class="hosting-explainer-box">
+            <div style="font-weight: 700; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span>Architecture & Public Publishing Details</span>
+            </div>
+            EduBridge runs on <strong>GitHub Pages static hosting</strong> with Firebase Authentication.
+            <ul style="margin: 8px 0 8px 18px; line-height: 1.4;">
+              <li>When you click <strong>Publish</strong>, your public project cards and bio are compiled into a shareable link that external visitors can open directly without signing in.</li>
+              <li>Private resume drafts, account phone numbers, and unverified details are strictly excluded from public URLs.</li>
+              <li>For automated multi-device cloud synchronization without URL parameters, connecting Cloud Firestore with owner-write and public-read rules provides the standard persistent backend.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- JavaScript Logic -->
+  <script type="module">
+    import { 
+      protectPage, 
+      getScopedKey, 
+      getScopedProfile, 
+      getUserInitials 
+    } from './auth-guard.js';
+
+    protectPage((currentUser) => {
+      /* --- 1. State & Storage Keys --- */
+      const storageKey = getScopedKey('edubridge_portfolio', currentUser);
+      const defaultProfile = getScopedProfile(currentUser);
+      const portfolioId = currentUser.uid.slice(0, 12);
+
+      let portfolioData = {
+        portfolioId: portfolioId,
+        displayName: defaultProfile.fullName || '',
+        headline: defaultProfile.degree ? `${defaultProfile.degree} Student` : 'Aspiring Software Developer',
+        bio: 'Passionate developer dedicated to engineering intuitive web applications and accessible educational tools.',
+        location: 'Bengaluru, India',
+        avatarUrl: '',
+        skills: defaultProfile.interests ? defaultProfile.interests.join(', ') : 'JavaScript, React, Node.js, Python, CSS',
+        college: defaultProfile.college || 'Engineering Institute of Technology',
+        degree: defaultProfile.degree || 'B.Tech Computer Science',
+        certifications: 'Cloud Foundations Certified, Web Development Graduate',
+        social: {
+          github: '',
+          linkedin: '',
+          website: '',
+          email: ''
+        },
+        projects: [
+          {
+            id: 'proj_1',
+            title: 'EduBridge Opportunity Matching Platform',
+            description: 'Designed an interactive student opportunity discovery system featuring real-time eligibility evaluation and application readiness checklists.',
+            technologies: 'Vanilla JavaScript, HTML5, CSS3, Firebase Auth',
+            githubUrl: 'https://github.com',
+            demoUrl: 'https://example.com'
+          }
+        ],
+        isPublished: false,
+        publishedAt: null
+      };
+
+      // Load saved state
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          portfolioData = { ...portfolioData, ...parsed };
+        }
+      } catch (err) {
+        console.warn('Could not load portfolio draft:', err);
+      }
+
+      /* --- 2. Toast Utility --- */
+      function showToast(message) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="color: #6ee7b7;">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>${message}</span>
+        `;
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 20);
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 350);
+        }, 3200);
+      }
+
+      /* --- 3. Save & Publish Helpers --- */
+      function saveDraft(showNotification = true) {
+        readFormIntoState();
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(portfolioData));
+          if (showNotification) {
+            showToast('Portfolio draft saved securely');
+          }
+        } catch (e) {
+          console.error('Failed to save portfolio to localStorage:', e);
+          showToast('Failed to save (storage limit exceeded)');
+        }
+      }
+
+      function generatePublicUrl() {
+        const publicPayload = {
+          portfolioId: portfolioData.portfolioId,
+          displayName: portfolioData.displayName,
+          headline: portfolioData.headline,
+          bio: portfolioData.bio,
+          location: portfolioData.location,
+          avatarUrl: portfolioData.avatarUrl,
+          skills: portfolioData.skills,
+          college: portfolioData.college,
+          degree: portfolioData.degree,
+          certifications: portfolioData.certifications,
+          social: portfolioData.social,
+          projects: portfolioData.projects,
+          publishedAt: portfolioData.publishedAt
+        };
+
+        // Encode clean public data in URL hash for zero-backend viewing across any device
+        const jsonStr = JSON.stringify(publicPayload);
+        const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
+        return new URL(`portfolio-view.html?id=${portfolioData.portfolioId}#p=${encoded}`, window.location.href).href;
+      }
+
+      function updatePublishUI() {
+        const statusBadge = document.getElementById('publishStatusBadge');
+        const statusText = document.getElementById('publishStatusText');
+        const publishToggleBtn = document.getElementById('publishToggleBtn');
+        const publishSuccessBar = document.getElementById('publishSuccessBar');
+        const viewPublicBtn = document.getElementById('viewPublicBtn');
+
+        if (portfolioData.isPublished) {
+          statusBadge.className = 'status-badge published';
+          statusText.textContent = 'Published (Public)';
+          publishToggleBtn.textContent = 'Update Published Site';
+          publishSuccessBar.style.display = 'flex';
+          viewPublicBtn.style.display = 'inline-flex';
+          viewPublicBtn.href = generatePublicUrl();
+        } else {
+          statusBadge.className = 'status-badge draft';
+          statusText.textContent = 'Draft (Private)';
+          publishToggleBtn.textContent = 'Publish Portfolio';
+          publishSuccessBar.style.display = 'none';
+          viewPublicBtn.style.display = 'none';
+        }
+      }
+
+      /* --- 4. Form Population & Reading --- */
+      function populateForm() {
+        document.getElementById('displayNameInput').value = portfolioData.displayName || '';
+        document.getElementById('publicHeadlineInput').value = portfolioData.headline || '';
+        document.getElementById('publicBioInput').value = portfolioData.bio || '';
+        document.getElementById('publicLocationInput').value = portfolioData.location || '';
+        document.getElementById('publicSkillsInput').value = portfolioData.skills || '';
+
+        document.getElementById('githubLinkInput').value = portfolioData.social.github || '';
+        document.getElementById('linkedinLinkInput').value = portfolioData.social.linkedin || '';
+        document.getElementById('websiteLinkInput').value = portfolioData.social.website || '';
+        document.getElementById('publicEmailInput').value = portfolioData.social.email || '';
+
+        document.getElementById('publicCollegeInput').value = portfolioData.college || '';
+        document.getElementById('publicDegreeInput').value = portfolioData.degree || '';
+        document.getElementById('publicCertificationsInput').value = portfolioData.certifications || '';
+
+        updateAvatarDisplay();
+        renderProjectsList();
+        updatePublishUI();
+      }
+
+      function updateAvatarDisplay() {
+        const box = document.getElementById('portfolioAvatarBox');
+        if (portfolioData.avatarUrl) {
+          box.innerHTML = `<img src="${portfolioData.avatarUrl}" alt="Avatar">`;
+        } else {
+          box.textContent = getUserInitials({ displayName: portfolioData.displayName, email: currentUser.email });
+        }
+      }
+
+      function readFormIntoState() {
+        portfolioData.displayName = document.getElementById('displayNameInput').value.trim();
+        portfolioData.headline = document.getElementById('publicHeadlineInput').value.trim();
+        portfolioData.bio = document.getElementById('publicBioInput').value.trim();
+        portfolioData.location = document.getElementById('publicLocationInput').value.trim();
+        portfolioData.skills = document.getElementById('publicSkillsInput').value.trim();
+
+        portfolioData.social = {
+          github: cleanUrl(document.getElementById('githubLinkInput').value.trim()),
+          linkedin: cleanUrl(document.getElementById('linkedinLinkInput').value.trim()),
+          website: cleanUrl(document.getElementById('websiteLinkInput').value.trim()),
+          email: document.getElementById('publicEmailInput').value.trim()
+        };
+
+        portfolioData.college = document.getElementById('publicCollegeInput').value.trim();
+        portfolioData.degree = document.getElementById('publicDegreeInput').value.trim();
+        portfolioData.certifications = document.getElementById('publicCertificationsInput').value.trim();
+      }
+
+      function cleanUrl(url) {
+        if (!url) return '';
+        if (url.startsWith('http://') || url.startsWith('https://')) return url;
+        return 'https://' + url;
+      }
+
+      /* --- 5. Projects Manager --- */
+      function renderProjectsList() {
+        const container = document.getElementById('portfolioProjectsContainer');
+        if (!portfolioData.projects || portfolioData.projects.length === 0) {
+          container.innerHTML = `
+            <div class="empty-projects-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" width="40" height="40" style="margin: 0 auto 10px; color: var(--text-muted);">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+              <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">No Projects Added Yet</h4>
+              <p style="font-size: 12.5px; color: var(--text-secondary); max-width: 320px; margin: 0 auto 14px;">Showcase your web applications, algorithms, hackathon submissions, or research projects.</p>
+              <button type="button" id="emptyAddProjectBtn" class="btn btn-primary btn-sm">+ Add Your First Project</button>
+            </div>
+          `;
+          const emptyBtn = document.getElementById('emptyAddProjectBtn');
+          if (emptyBtn) emptyBtn.addEventListener('click', addProject);
+          return;
+        }
+
+        container.innerHTML = portfolioData.projects.map((proj, idx) => `
+          <div class="project-item-card" data-id="${proj.id}">
+            <button type="button" class="project-item-remove remove-project-btn" data-id="${proj.id}" aria-label="Remove project">&times; Remove</button>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Project Title *</label>
+                <input type="text" class="form-input proj-title-input" value="${escapeHtml(proj.title || '')}" placeholder="e.g. Distributed Task Queue">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Technologies Used</label>
+                <input type="text" class="form-input proj-tech-input" value="${escapeHtml(proj.technologies || '')}" placeholder="e.g. React, Node.js, WebSockets">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Description / Highlights</label>
+              <textarea class="form-textarea proj-desc-input" rows="2" placeholder="Briefly describe the objective, challenges solved, and tangible impact of this project.">${escapeHtml(proj.description || '')}</textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">GitHub Repository Link</label>
+                <input type="url" class="form-input proj-github-input" value="${escapeHtml(proj.githubUrl || '')}" placeholder="https://github.com/...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Live Demo / Deployed Link</label>
+                <input type="url" class="form-input proj-demo-input" value="${escapeHtml(proj.demoUrl || '')}" placeholder="https://...">
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        // Wire project field updates
+        container.querySelectorAll('.project-item-card').forEach(el => {
+          const id = el.getAttribute('data-id');
+          const target = portfolioData.projects.find(p => p.id === id);
+          if (!target) return;
+
+          el.querySelector('.proj-title-input').addEventListener('input', (e) => {
+            target.title = e.target.value;
+          });
+          el.querySelector('.proj-tech-input').addEventListener('input', (e) => {
+            target.technologies = e.target.value;
+          });
+          el.querySelector('.proj-desc-input').addEventListener('input', (e) => {
+            target.description = e.target.value;
+          });
+          el.querySelector('.proj-github-input').addEventListener('input', (e) => {
+            target.githubUrl = cleanUrl(e.target.value);
+          });
+          el.querySelector('.proj-demo-input').addEventListener('input', (e) => {
+            target.demoUrl = cleanUrl(e.target.value);
+          });
+        });
+
+        // Wire remove buttons
+        container.querySelectorAll('.remove-project-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const id = e.target.getAttribute('data-id');
+            portfolioData.projects = portfolioData.projects.filter(p => p.id !== id);
+            renderProjectsList();
+          });
+        });
+      }
+
+      function addProject() {
+        portfolioData.projects.push({
+          id: 'proj_' + Date.now(),
+          title: '',
+          technologies: '',
+          description: '',
+          githubUrl: '',
+          demoUrl: ''
+        });
+        renderProjectsList();
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      /* --- 6. Event Listeners --- */
+      document.getElementById('addNewProjectBtn').addEventListener('click', addProject);
+      document.getElementById('saveDraftBtn').addEventListener('click', () => saveDraft(true));
+
+      // Image upload validation (under 1MB, image types only)
+      document.getElementById('avatarFileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+          showToast('Please select a valid image file (PNG, JPG, or WEBP)');
+          return;
+        }
+
+        if (file.size > 1024 * 1024) {
+          showToast('Image size must be less than 1MB');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          portfolioData.avatarUrl = evt.target.result;
+          updateAvatarDisplay();
+          showToast('Profile image updated');
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Publish Toggle
+      document.getElementById('publishToggleBtn').addEventListener('click', () => {
+        readFormIntoState();
+
+        if (!portfolioData.displayName) {
+          showToast('Please enter your Display Name before publishing');
+          return;
+        }
+
+        portfolioData.isPublished = true;
+        portfolioData.publishedAt = new Date().toISOString();
+
+        // Store public version under public key
+        try {
+          const publicRecord = {
+            portfolioId: portfolioData.portfolioId,
+            displayName: portfolioData.displayName,
+            headline: portfolioData.headline,
+            bio: portfolioData.bio,
+            location: portfolioData.location,
+            avatarUrl: portfolioData.avatarUrl,
+            skills: portfolioData.skills,
+            college: portfolioData.college,
+            degree: portfolioData.degree,
+            certifications: portfolioData.certifications,
+            social: portfolioData.social,
+            projects: portfolioData.projects,
+            publishedAt: portfolioData.publishedAt
+          };
+          localStorage.setItem(`edubridge_public_portfolio_${portfolioData.portfolioId}`, JSON.stringify(publicRecord));
+        } catch (e) {
+          console.warn('Local storage error while caching public record:', e);
+        }
+
+        saveDraft(false);
+        updatePublishUI();
+        showToast('Portfolio published successfully! Copy your link below.');
+      });
+
+      // Unpublish Button
+      document.getElementById('unpublishBtn').addEventListener('click', () => {
+        portfolioData.isPublished = false;
+        portfolioData.publishedAt = null;
+        try {
+          localStorage.removeItem(`edubridge_public_portfolio_${portfolioData.portfolioId}`);
+        } catch (e) {}
+
+        saveDraft(false);
+        updatePublishUI();
+        showToast('Portfolio has been unpublished and is now private.');
+      });
+
+      // Copy Public Link
+      document.getElementById('copyPublicLinkBtn').addEventListener('click', async () => {
+        const url = generatePublicUrl();
+        try {
+          await navigator.clipboard.writeText(url);
+          showToast('Public portfolio link copied to clipboard!');
+        } catch (err) {
+          prompt('Copy your portfolio link:', url);
+        }
+      });
+
+      // Sidebar Toggles
+      const desktopHamburgerBtn = document.getElementById('desktopHamburgerBtn');
+      const mobileHamburgerBtn = document.getElementById('mobileHamburgerBtn');
+      const sidebar = document.getElementById('mainSidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+
+      if (desktopHamburgerBtn) {
+        desktopHamburgerBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('collapsed');
+        });
+      }
+
+      if (mobileHamburgerBtn) {
+        mobileHamburgerBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('mobile-open');
+          backdrop.classList.toggle('active');
+        });
+      }
+
+      if (backdrop) {
+        backdrop.addEventListener('click', () => {
+          sidebar.classList.remove('mobile-open');
+          backdrop.classList.remove('active');
+        });
+      }
+
+      // Initial Render
+      populateForm();
+    });
+  </script>
+</body>
+</html>
